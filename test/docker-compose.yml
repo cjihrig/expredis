@@ -1,0 +1,16 @@
+version: '2.1'
+
+services:
+  redis_1:
+    image: redis:4-alpine
+    mem_limit: 512m
+    restart: always
+    ports:
+      - 6379:6379
+
+  redis_2:
+    image: redis:4-alpine
+    mem_limit: 512m
+    restart: always
+    ports:
+      - 6380:6379

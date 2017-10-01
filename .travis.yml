@@ -1,0 +1,11 @@
+sudo: required
+language: node_js
+services:
+  - docker
+before_script:
+  - docker-compose -f test/docker-compose.yml up -d
+after_script:
+  - docker-compose -f test/docker-compose.yml down
+node_js:
+  - "6"
+  - "8"
