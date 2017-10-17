@@ -1,6 +1,6 @@
 {
   "name": "expredis",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Express session store for redundant Redis instances",
   "author": "Continuation Labs <contact@continuation.io> (http://continuation.io/)",
   "main": "lib/index.js",
