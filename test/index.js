@@ -181,6 +181,74 @@ describe('Expredis', () => {
     });
   });
 
+  it('clears all data', (done) => {
+    const store = createStore();
+
+    waitForAllReady(store, () => {
+      store.set('foo', 'bar', (err) => {
+        expect(err).to.not.exist();
+        store.set('baz', 'quux', (err) => {
+          expect(err).to.not.exist();
+          store.get('foo', (err, data) => {
+            expect(err).to.not.exist();
+            expect(data).to.equal('bar');
+            store.get('baz', (err, data) => {
+              expect(err).to.not.exist();
+              expect(data).to.equal('quux');
+              store.clear((err) => {
+                expect(err).to.not.exist();
+                store.get('foo', (err, data) => {
+                  expect(err).to.not.exist();
+                  expect(data).to.equal(null);
+                  store.get('baz', (err, data) => {
+                    expect(err).to.not.exist();
+                    expect(data).to.equal(null);
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+
+  it('gets data store length', (done) => {
+    const store = createStore();
+
+    waitForAllReady(store, () => {
+      store.clear((err) => {
+        expect(err).to.not.exist();
+        store.length((err, length) => {
+          expect(err).to.not.exist();
+          expect(length).to.equal(0);
+          store.set('foo', 'bar', (err) => {
+            expect(err).to.not.exist();
+            store.length((err, length) => {
+              expect(err).to.not.exist();
+              expect(length).to.equal(1);
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+
+  it('handles errors while getting length', (done) => {
+    const store = createStore();
+
+    waitForAllReady(store, () => {
+      store.close();
+      store.length((err, length) => {
+        expect(length).to.equal(0);
+        expect(err.message).to.match(/The connection is already closed/);
+        done();
+      });
+    });
+  });
+
   it('closes connection', (done) => {
     const store = createStore();
 
@@ -206,6 +274,71 @@ describe('Expredis', () => {
     done();
   });
 
+  it('parses ttl option', (done) => {
+    let store = createStore();
+    expect(store.ttl).to.equal(null);
+
+    store = createStore({ ttl: false });
+    expect(store.ttl).to.equal(false);
+
+    store = createStore({ ttl: 500 });
+    expect(store.ttl).to.equal(500);
+
+    [3.1, '5', true, {}, [], undefined, Symbol('s')].forEach((ttl) => {
+      expect(() => {
+        store = createStore({ ttl });
+      }).to.throw(TypeError, 'ttl must be an integer or false');
+    });
+    done();
+  });
+
+  it('sets data with no ttl and no session cookie', (done) => {
+    const store = createStore({ ttl: false });
+
+    waitForAllReady(store, () => {
+      store.set('foo', { bar: 'baz' }, (err) => {
+        expect(err).to.not.exist();
+        done();
+      });
+    });
+  });
+
+  it('updates ttls via touch operation', (done) => {
+    const store = createStore({ ttl: 50000 });
+
+    waitForAllReady(store, () => {
+      store.set('foo', { bar: 'baz' }, (err) => {
+        expect(err).to.not.exist();
+        store.touch('foo', { bar: 'abc' }, (err) => {
+          expect(err).to.not.exist();
+          store.get('foo', (err, data) => {
+            expect(err).to.not.exist();
+            expect(data).to.equal({ bar: 'baz' });
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  it('touch is a noop when ttl is false', (done) => {
+    const store = createStore({ ttl: false });
+
+    waitForAllReady(store, () => {
+      store.set('foo', { bar: 'baz' }, (err) => {
+        expect(err).to.not.exist();
+        store.touch('foo', { bar: 'abc' }, (err) => {
+          expect(err).to.not.exist();
+          store.get('foo', (err, data) => {
+            expect(err).to.not.exist();
+            expect(data).to.equal({ bar: 'baz' });
+            done();
+          });
+        });
+      });
+    });
+  });
+
   it('works with express', (done) => {
     const app = new Express();
     const store = createStore();
@@ -215,7 +348,7 @@ describe('Expredis', () => {
       secret: 'foobar',
       resave: true,
       saveUninitialized: false,
-      cookie: { secure: false },
+      cookie: { secure: false, maxAge: 5000 },
       store
     }));
 
