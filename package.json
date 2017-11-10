@@ -1,6 +1,6 @@
 {
   "name": "expredis",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Express session store for redundant Redis instances",
   "author": "Continuation Labs <contact@continuation.io> (http://continuation.io/)",
   "main": "lib/index.js",
@@ -15,7 +15,8 @@
   "license": "MIT",
   "scripts": {
     "lint": "belly-button -f",
-    "test": "npm run lint && lab -v -t 100"
+    "test": "npm run lint && lab -v -t 100",
+    "postinstall": "enforce-node-version"
   },
   "engines": {
     "node": ">=6.0.0"
@@ -27,6 +28,7 @@
   "devDependencies": {
     "artificial": "0.1.x",
     "belly-button": "4.x.x",
+    "enforce-node-version": "0.1.0",
     "express": "4.x.x",
     "express-session": "1.x.x",
     "lab": "14.x.x",
