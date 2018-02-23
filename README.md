@@ -3,8 +3,8 @@
 [![Current Version](https://img.shields.io/npm/v/expredis.svg)](https://www.npmjs.org/package/expredis)
 [![Build Status via Travis CI](https://travis-ci.org/continuationlabs/expredis.svg?branch=master)](https://travis-ci.org/continuationlabs/expredis)
 ![Dependencies](http://img.shields.io/david/continuationlabs/expredis.svg)
+[![belly-button-style](https://img.shields.io/badge/eslint-bellybutton-4B32C3.svg)](https://github.com/continuationlabs/belly-button)
 
-[![belly-button-style](https://cdn.rawgit.com/continuationlabs/belly-button/master/badge.svg)](https://github.com/continuationlabs/belly-button)
 
 Express session store for use with redundant Redis instances. All operations are performed simultaneously on an arbitrary number of independent Redis instances. When retrieving data, the result is taken from the first Redis instance to respond.
 
